@@ -194,6 +194,7 @@ LOCAL_AIDL_INCLUDES := frameworks/support/v4/java
 LOCAL_SRC_FILES := $(call all-java-files-under, java) \
     $(call all-Iaidl-files-under, java)
 
-
 LOCAL_STATIC_JAVA_LIBRARIES += android-support-v4-api22
+LOCAL_JAVA_LIBRARIES := framework
+
 include $(BUILD_STATIC_JAVA_LIBRARY)

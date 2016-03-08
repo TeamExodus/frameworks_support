@@ -1339,7 +1339,14 @@ public class RenderScript {
                     sUseGCHooks = false;
                 }
                 try {
-                    System.loadLibrary("rsjni");
+                    // For API 9 - 22, always use the absolute path of librsjni.so
+                    // http://b/25226912
+                    if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.M &&
+                        rs.mNativeLibDir != null) {
+                        System.load(rs.mNativeLibDir + "/librsjni.so");
+                    } else {
+                        System.loadLibrary("rsjni");
+                    }
                     sInitialized = true;
                     sPointerSize = rsnSystemGetPointerSize();
                 } catch (UnsatisfiedLinkError e) {
@@ -1364,13 +1371,25 @@ public class RenderScript {
             // If the device API is higher than target API level, init dispatch table based on device API.
             dispatchAPI = android.os.Build.VERSION.SDK_INT;
         }
-        if (!rs.nLoadSO(useNative, dispatchAPI)) {
+        String rssupportPath = null;
+        // For API 9 - 22, always use the absolute path of libRSSupport.so
+        // http://b/25226912
+        if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.M &&
+            rs.mNativeLibDir != null) {
+            rssupportPath = rs.mNativeLibDir + "/libRSSupport.so";
+        }
+        if (!rs.nLoadSO(useNative, dispatchAPI, rssupportPath)) {
             if (useNative) {
                 android.util.Log.v(LOG_TAG, "Unable to load libRS.so, falling back to compat mode");
                 useNative = false;
             }
             try {
-                System.loadLibrary("RSSupport");
+                if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.M &&
+                    rs.mNativeLibDir != null) {
+                    System.load(rssupportPath);
+                } else {
+                    System.loadLibrary("RSSupport");
+                }
             } catch (UnsatisfiedLinkError e) {
                 Log.e(LOG_TAG, "Error loading RS Compat library: " + e);
                 throw new RSRuntimeException("Error loading RS Compat library: " + e);

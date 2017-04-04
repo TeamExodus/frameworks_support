@@ -42,6 +42,7 @@ import android.support.annotation.ColorInt;
 import android.support.design.test.R;
 import android.support.design.testutils.TestDrawable;
 import android.support.design.testutils.TestUtilsMatchers;
+import android.support.test.annotation.UiThreadTest;
 import android.support.v4.content.res.ResourcesCompat;
 import android.test.suitebuilder.annotation.SmallTest;
 import android.view.Menu;
@@ -75,6 +76,20 @@ public class BottomNavigationViewTest
         mMenuStringContent.put(R.id.destination_home, res.getString(R.string.navigate_home));
         mMenuStringContent.put(R.id.destination_profile, res.getString(R.string.navigate_profile));
         mMenuStringContent.put(R.id.destination_people, res.getString(R.string.navigate_people));
+    }
+
+    @UiThreadTest
+    @Test
+    @SmallTest
+    public void testAddItemsWithoutMenuInflation() {
+        BottomNavigationView navigation = new BottomNavigationView(mActivityTestRule.getActivity());
+        mActivityTestRule.getActivity().setContentView(navigation);
+        navigation.getMenu().add("Item1");
+        navigation.getMenu().add("Item2");
+        assertEquals(2, navigation.getMenu().size());
+        navigation.getMenu().removeItem(0);
+        navigation.getMenu().removeItem(0);
+        assertEquals(0, navigation.getMenu().size());
     }
 
     @Test
@@ -195,5 +210,28 @@ public class BottomNavigationViewTest
                 matches(TestUtilsMatchers.drawable(greenFill, allowedComponentVariance)));
         onView(allOf(withId(R.id.icon), isDescendantOfA(withId(R.id.destination_people)))).check(
                 matches(TestUtilsMatchers.drawable(blueFill, allowedComponentVariance)));
+    }
+
+    @UiThreadTest
+    @Test
+    @SmallTest
+    public void testItemChecking() throws Throwable {
+        final Menu menu = mBottomNavigation.getMenu();
+        assertTrue(menu.getItem(0).isChecked());
+        checkAndVerifyExclusiveItem(menu, R.id.destination_home);
+        checkAndVerifyExclusiveItem(menu, R.id.destination_profile);
+        checkAndVerifyExclusiveItem(menu, R.id.destination_people);
+    }
+
+    private void checkAndVerifyExclusiveItem(final Menu menu, final int id) throws Throwable {
+        menu.findItem(id).setChecked(true);
+        for (int i = 0; i < menu.size(); i++) {
+            final MenuItem item = menu.getItem(i);
+            if (item.getItemId() == id) {
+                assertTrue(item.isChecked());
+            } else {
+                assertFalse(item.isChecked());
+            }
+        }
     }
 }

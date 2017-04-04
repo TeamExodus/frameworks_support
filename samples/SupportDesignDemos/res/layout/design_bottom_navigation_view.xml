@@ -52,11 +52,18 @@
                 android:text="@string/bottomnavigation_tint"
                 android:layout_below="@+id/button_remove"/>
 
+            <Button
+                android:id="@+id/button_select_next"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/bottomnavigation_select_next"
+                android:layout_below="@+id/button_tint"/>
+
             <TextView
                 android:id="@+id/selected_item"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/button_tint"/>
+                android:layout_below="@+id/button_select_next"/>
         </RelativeLayout>
     </ScrollView>
     <android.support.design.widget.BottomNavigationView
@@ -64,6 +71,6 @@
             android:layout_width="match_parent"
             android:layout_height="56dp"
             android:layout_gravity="bottom"
-            android:background="#eee"
+            android:background="#fafafa"
             app:menu="@menu/sample_bottom_menu"/>
 </FrameLayout>
